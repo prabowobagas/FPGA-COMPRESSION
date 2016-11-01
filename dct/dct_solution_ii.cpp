@@ -7,14 +7,14 @@
 using namespace std;
 
 
-static const float c0 =  0.353553391 ;    //1. / sqrt(2.) * sqrt(2. / 8.);
-static const float c1 =  0.49039264  ;   //cos(M_PI * 1. / 16.) * sqrt(2. / 8.);
+static const float c0 =  0.353553391 ;  //1. / sqrt(2.) * sqrt(2. / 8.);
+static const float c1 =  0.49039264  ;  //cos(M_PI * 1. / 16.) * sqrt(2. / 8.);
 static const float c2 =  0.461939766 ;  //cos(M_PI * 2. / 16.) * sqrt(2. / 8.);
-static const float c3 =  0.415734806 ; //cos(M_PI * 3. / 16.) * sqrt(2. / 8.);
-static const float c4 =  0.353553391 ;//cos(M_PI * 4. / 16.) * sqrt(2. / 8.);
-static const float c5 =  0.277785117 ;   //cos(M_PI * 5. / 16.) * sqrt(2. / 8.);
+static const float c3 =  0.415734806 ;  //cos(M_PI * 3. / 16.) * sqrt(2. / 8.);
+static const float c4 =  0.353553391 ;  //cos(M_PI * 4. / 16.) * sqrt(2. / 8.);
+static const float c5 =  0.277785117 ;  //cos(M_PI * 5. / 16.) * sqrt(2. / 8.);
 static const float c6 =  0.191341716 ;  //cos(M_PI * 6. / 16.) * sqrt(2. / 8.);
-static const float c7 =  0.097545161 ; //cos(M_PI * 7. / 16.) * sqrt(2. / 8.);
+static const float c7 =  0.097545161 ;  //cos(M_PI * 7. / 16.) * sqrt(2. / 8.);
 
 #define a x[0]
 #define b x[1]
