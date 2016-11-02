@@ -1,13 +1,15 @@
 #include "dct.h"
 
-static const typedef ap_fixed<15,12, AP_RND, AP_SAT> c0;// = 0.353553391;
-static const typedef ap_fixed<15,12, AP_RND, AP_SAT> c1;// = 0.49039264;
-static const typedef ap_fixed<15,12, AP_RND, AP_SAT> c2;// = 0.461939766;
-static const typedef ap_fixed<15,12, AP_RND, AP_SAT> c3;// = 0.415734806;
-static const typedef ap_fixed<15,12, AP_RND, AP_SAT> c4;// = 0.353553391;
-static const typedef ap_fixed<15,12, AP_RND, AP_SAT> c5;// = 0.277785117;
-typedef ap_fixed<15,12, AP_RND, AP_SAT> c6;// = 0.191341716;
-typedef ap_fixed<15,12, AP_RND, AP_SAT> c7;// = 0.097545161;
+
+static const float c0 =  0.353553391 ;  //1. / sqrt(2.) * sqrt(2. / 8.);
+static const float c1 =  0.49039264  ;  //cos(M_PI * 1. / 16.) * sqrt(2. / 8.);
+static const float c2 =  0.461939766 ;  //cos(M_PI * 2. / 16.) * sqrt(2. / 8.);
+static const float c3 =  0.415734806 ;  //cos(M_PI * 3. / 16.) * sqrt(2. / 8.);
+static const float c4 =  0.353553391 ;  //cos(M_PI * 4. / 16.) * sqrt(2. / 8.);
+static const float c5 =  0.277785117 ;  //cos(M_PI * 5. / 16.) * sqrt(2. / 8.);
+static const float c6 =  0.191341716 ;  //cos(M_PI * 6. / 16.) * sqrt(2. / 8.);
+static const float c7 =  0.097545161 ;  //cos(M_PI * 7. / 16.) * sqrt(2. / 8.);
+
 
 
 #define a x[0]
@@ -20,14 +22,6 @@ typedef ap_fixed<15,12, AP_RND, AP_SAT> c7;// = 0.097545161;
 #define h x[7]
 
 void dct_ii_8a(const float x[8], float X[8]) {
-	c0 = 0.353553391;
-	c1 = 0.49039264;
-	c2 = 0.461939766;
-	c3 = 0.415734806;
-	c4 = 0.353553391;
-	c5 = 0.277785117;
-	c6 = 0.191341716;
-	c7 = 0.097545161;
   X[0] = a*c0 + b*c0 + c*c0 + d*c0 + e*c0 + f*c0 + g*c0 + h*c0;
   X[1] = a*c1 + b*c3 + c*c5 + d*c7 - e*c7 - f*c5 - g*c3 - h*c1;
   X[2] = a*c2 + b*c6 - c*c6 - d*c2 - e*c2 - f*c6 + g*c6 + h*c2;
@@ -76,6 +70,7 @@ void dct_2d(const float inMatrix[8][8],float outMatrix[8][8])
         dct_ii_8a(bMatrix[i],cMatrix[i]);
     }
     matrix_transpose(cMatrix,outMatrix);
+
 }
 
 
