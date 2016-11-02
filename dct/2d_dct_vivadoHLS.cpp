@@ -10,7 +10,7 @@ static const float c5 =  0.277785117 ;  //cos(M_PI * 5. / 16.) * sqrt(2. / 8.);
 static const float c6 =  0.191341716 ;  //cos(M_PI * 6. / 16.) * sqrt(2. / 8.);
 static const float c7 =  0.097545161 ;  //cos(M_PI * 7. / 16.) * sqrt(2. / 8.);
 
-
+//c++ rounds down, so if it is not working add +0.5
 
 #define a x[0]
 #define b x[1]
@@ -20,6 +20,7 @@ static const float c7 =  0.097545161 ;  //cos(M_PI * 7. / 16.) * sqrt(2. / 8.);
 #define f x[5]
 #define g x[6]
 #define h x[7]
+
 
 void dct_ii_8a(const float x[8], float X[8]) {
   X[0] = a*c0 + b*c0 + c*c0 + d*c0 + e*c0 + f*c0 + g*c0 + h*c0;
@@ -53,7 +54,30 @@ void matrix_transpose(float inMatrix[8][8],float transposed_matrix[8][8])
 }
 
 
-void dct_2d(const float inMatrix[8][8],float outMatrix[8][8])
+void quantitized(float inMatrix[8][8],int doneMatrix[8][8])
+{
+	int i,j;
+	float q_50[8][8]=
+	{
+			{16,11,10,16,24,40,51,61},
+			{12,12,14,19,26,58,60,55},
+			{14,13,16,24,40,57,69,56},
+			{14,17,22,29,51,87,80,62},
+			{18,22,37,56,68,109,103,77},
+			{24,35,55,64,81,104,113,92},
+			{49,64,78,87,103,121,120,101},
+			{72,92,95,68,112,100,103,99}
+	};
+	for (i=0;i<8;i++)
+	{
+		for (j=0;j<9;j++)
+		{
+			doneMatrix[i][j]= round(inMatrix[i][j]/q_50[i][j]);
+		}
+	}
+}
+
+void dct_2d(const float inMatrix[8][8],int doneMatrix[8][8])
 {
     float bMatrix[8][8]={0},cMatrix[8][8]={0};
     int i,j;
@@ -69,8 +93,6 @@ void dct_2d(const float inMatrix[8][8],float outMatrix[8][8])
     {
         dct_ii_8a(bMatrix[i],cMatrix[i]);
     }
-    matrix_transpose(cMatrix,outMatrix);
-
+    matrix_transpose(cMatrix,cMatrix);
+    quantitized(cMatrix,doneMatrix);
 }
-
-
