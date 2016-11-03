@@ -1,0 +1,102 @@
+#include "dct.h"
+
+const unsigned A_ROWS = 8;
+const unsigned A_COLS = 8;
+const unsigned B_ROWS = 8;
+const unsigned B_COLS = 8;
+const unsigned C_ROWS = A_ROWS;
+const unsigned C_COLS = B_COLS;
+
+struct My_config: hls::matrix_multiply_traits<hls::NoTranspose,
+											  hls::NoTranspose,
+											  A_ROWS,
+											  A_COLS,
+											  B_ROWS,
+											  B_COLS,
+											  float,
+											  float>{
+  static const int ARCH	= 2;
+  static const int INNER_II = 1;
+  static const int UNROLL_FACTOR = 4;
+};
+
+struct My_config_transpose: hls::matrix_multiply_traits<hls::NoTranspose,
+											  hls::Transpose,
+											  A_ROWS,
+											  A_COLS,
+											  B_ROWS,
+											  B_COLS,
+											  float,
+											  float>{
+  static const int ARCH	= 2;
+  static const int INNER_II = 1;
+  static const int UNROLL_FACTOR = 4;
+};
+
+
+void cast_int_to_float(const int inMatrix[8][8], float outMatrix[8][8])
+{
+	int i,j;
+
+	cast_int_to_float_l:for (i=0;i<8;i++)
+	{
+		for(j=0;j<8;j++)
+		{
+			outMatrix[i][j]=inMatrix[i][j];
+		}
+	}
+}
+
+void quantitized(float inMatrix[8][8],int doneMatrix[8][8])
+{
+	int i,j;
+	float q_50[8][8]=
+	{
+			{16,11,10,16,24,40,51,61},
+			{12,12,14,19,26,58,60,55},
+			{14,13,16,24,40,57,69,56},
+			{14,17,22,29,51,87,80,62},
+			{18,22,37,56,68,109,103,77},
+			{24,35,55,64,81,104,113,92},
+			{49,64,78,87,103,121,120,101},
+			{72,92,95,68,112,100,103,99}
+	};
+
+	quantitized:for (i=0;i<8;i++)
+	{
+		for (j=0;j<8;j++)
+		{
+			doneMatrix[i][j]= round(inMatrix[i][j]/q_50[i][j]);
+		}
+	}
+}
+
+
+void dct_2d(const int inMatrix[8][8],int doneMatrix[8][8])
+{
+  	int i,j;
+	float dct_2d_coeff[8][8]=
+      {
+    		  {0.3536,    0.3536,    0.3536,    0.3536,    0.3536,    0.3536,    0.3536,    0.3536},
+    		  {0.4904,    0.4157,    0.2778,    0.0975,   -0.0975,   -0.2778,   -0.4157,   -0.4904},
+    		  {0.4619,    0.1913,   -0.1913,   -0.4619,   -0.4619,   -0.1913,    0.1913,    0.4619},
+    		  {0.4157,   -0.0975,   -0.4904,   -0.2778,    0.2778,    0.4904,    0.0975,   -0.4157},
+    		  {0.3536,   -0.3536,   -0.3536,    0.3536,    0.3536,   -0.3536,   -0.3536,    0.3536},
+    		  {0.2778,   -0.4904,    0.0975,    0.4157,   -0.4157,   -0.0975,    0.4904,   -0.2778},
+    		  {0.1913,   -0.4619,    0.4619,   -0.1913,   -0.1913,    0.4619,   -0.4619,    0.1913},
+    		  {0.0975,   -0.2778,    0.4157,   -0.4904,    0.4904,   -0.4157,    0.2778,   -0.0975}
+
+      };
+
+  	float Buffer_Matrix[8][8];
+  	float C_Matrix[8][8];
+	float D_Matrix[8][8];
+
+	cast_int_to_float(inMatrix,Buffer_Matrix);
+  	hls::matrix_multiply_top<hls::NoTranspose, hls::NoTranspose, A_ROWS, A_COLS, B_ROWS, B_COLS, C_ROWS, C_COLS,My_config, float, float> (dct_2d_coeff,Buffer_Matrix, C_Matrix);
+  	hls::matrix_multiply_top<hls::NoTranspose, hls::Transpose, A_ROWS, A_COLS, B_ROWS, B_COLS, C_ROWS, C_COLS, My_config_transpose,float, float> (C_Matrix,dct_2d_coeff, D_Matrix);
+  	quantitized(D_Matrix,doneMatrix);
+}
+
+
+
